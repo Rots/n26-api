@@ -1,0 +1,1104 @@
+openapi: "3.0.0"
+info:
+  description: "Collection of observed API calls and methods. No guarantees are provided that they are still functioning as specified."
+  version: "0.2"
+  title: "N26 bank unofficial OpenAPI definition"
+  termsOfService: "https://next.n26.com/en-de/bug-bounty-program/"
+  contact:
+    email: "security@n26.com"
+
+servers:
+- url: "https://api.tech26.de/api"
+
+security:
+- auth:
+  - read
+
+paths:
+  /me:
+    get:
+      parameters:
+      - name: full
+        in: query
+        schema:
+          type: boolean
+      description: "Get details about current user"
+      tags:
+      - account
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/Me'
+                - type: object
+                  title: full details
+                  properties:
+                    userInfo:
+                      $ref: '#/components/schemas/Me'
+                    account:
+                      type: object
+                    cards:
+                      type: array
+                    addresses:
+                      type: array
+                    userFeatures:
+                      type: array
+                      items:
+                        type: string
+                    features:
+                      type: object
+                    overdraft:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                    insurance:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                    userStatus:
+                      type: object
+                    pairingCheck:
+                      type: object
+                    preference:
+                      type: object
+                    userCustomSetting:
+                      type: object
+                    fairUsePolicy:
+                      type: object
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /me/statuses:
+    get:
+      description: "Get details about current user"
+      tags:
+      - account
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  created:
+                    type: integer
+                  updated:
+                    type: integer
+                  singleStepSignup:
+                    type: integer
+                  emailValidationInitiated:
+                    type: integer
+                  emailValidationCompleted:
+                    type: integer
+                  productSelectionCompleted:
+                    type: integer
+                  phonePairingInitiated:
+                    type: integer
+                  phonePairingCompleted:
+                    type: integer
+                  kycInitiated:
+                    type: integer
+                  kycCompleted:
+                    type: integer
+                  kycDetails:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      provider:
+                        type: string
+                  cardActivationCompleted:
+                    type: integer
+                  pinDefinitionCompleted:
+                    type: integer
+                  bankAccountCreationInitiated:
+                    type: integer
+                  bankAccountCreationSucceded:
+                    type: integer
+                  coreDataUpdated:
+                    type: integer
+                  firstIncomingTransaction:
+                    type: integer
+                  flexAccount:
+                    type: boolean
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /accounts/stats:
+    get:
+      description: "Get details about current user"
+      tags:
+      - account
+      parameters:
+      - name: type
+        in: query
+        schema:
+          type: string
+      - name: from
+        in: query
+        schema:
+          type: integer
+      - name: to
+        in: query
+        schema:
+          type: integer
+      - name: numSlices
+        in: query
+        schema:
+          type: integer
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /accounts:
+    get:
+      description: "Get details about current user"
+      tags:
+      - account
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  availableBalance:
+                    type: number
+                  usableBalance:
+                    type: number
+                  bankBalance:
+                    type: number
+                  iban:
+                    type: string
+                  bic:
+                    type: string
+                  bankName:
+                    type: string
+                  seized:
+                    type: boolean
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /addresses:
+    get:
+      description: "Get details about current user"
+      tags:
+      - account
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  paging:
+                    type: object
+                    properties:
+                      totalResults:
+                        type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        addressLine1:
+                          type: string
+                        streetName:
+                          type: string
+                        houseNumberBlock:
+                          type: string
+                        zipCode:
+                          type: string
+                        cityName:
+                          type: string
+                        countryName:
+                          type: string
+                        type:
+                          type: string
+                        userId:
+                          type: string
+                          format: uuid
+                        id:
+                          type: string
+                          format: uuid
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v2/cards:
+    get:
+      description: "List the cards"
+      tags:
+      - account
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Card'
+
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /cards:
+    get:
+      description: "List the cards"
+      tags:
+      - account
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  paging:
+                    type: object
+                    properties:
+                      totalResults:
+                        type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Card'
+
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /cards/{cardId}:
+    get:
+      description: "Get details about current user"
+      tags:
+      - account
+      parameters:
+      - name: cardId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /settings/account/limits:
+    get:
+      description: "Get details about current user account"
+      tags:
+      - account
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    limit:
+                      type: string
+                      example: POS_DAILY_ACCOUNT
+                    amount:
+                      type: number
+                      example: 2500
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /settings/limits/{cardId}:
+    get:
+      description: "Get card limits"
+      tags:
+      - account
+      parameters:
+      - name: cardId
+        required: true
+        in: path
+        schema:
+          type: string
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - limit
+                  oneOf:
+                  - type: object
+                    properties:
+                      limit:
+                        type: string
+                        example: POS_TRANSACTION
+                      amount:
+                        type: number
+                        example: 2500
+                  - type: object
+                    properties:
+                      limit:
+                        type: string
+                        example: COUNTRY_LIST
+                      countryList:
+                        type: array
+                        items:
+                          type: string
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /smrt/contacts:
+    get:
+      description: "Contacts"
+      tags:
+      - account
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    userId:
+                      type: string
+                      format: uuid
+                    id:
+                      type: string
+                      format: uuid
+                    name:
+                      type: string
+                    subtitle:
+                      type: string
+                    account:
+                      type: object
+                      properties:
+                        accountType:
+                          type: string
+                        iban:
+                          type: string
+                        bic:
+                          type: string
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /smrt/transactions:
+    get:
+      description: "Transactions"
+      tags:
+      - transactions
+      parameters:
+      - name: from
+        in: query
+        description: Timestamp - milliseconds since 1970 in CET
+        schema:
+          type: integer
+      - name: to
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        description: Limit the number of transactions to return
+        in: query
+        schema:
+          type: integer
+      - name: pending
+        in: query
+        schema:
+          type: boolean
+      - name: categories
+        description: Comma separated list of category IDs
+        in: query
+        schema:
+          type: string
+      - name: textFilter
+        in: query
+        description: Query string to search for
+        schema:
+          type: string
+      - name: lastId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    userId:
+                      type: string
+                      format: uuid
+                    type:
+                      type: string
+                    amount:
+                      type: number
+                    currencyCode:
+                      type: string
+                    originalAmount:
+                      type: number
+                    originalCurrency:
+                      type: string
+                    exchangeRate:
+                      type: number
+                    merchantCity:
+                      type: string
+                    visibleTS:
+                      type: integer
+                    mcc:
+                      type: integer
+                    mccGroup:
+                      type: integer
+                    merchantName:
+                      type: string
+                    recurring:
+                      type: boolean
+                    partnerBic:
+                      type: string
+                    partnerAccountIsSepa:
+                      type: boolean
+                    partnerName:
+                      type: string
+                    accountId:
+                      type: string
+                      format: uuid
+                    partnerIban:
+                      type: string
+                    category:
+                      type: string
+                    cardId:
+                      type: string
+                      format: uuid
+                    referenceText:
+                      type: string
+                    userAccepted:
+                      type: integer
+                    userCertified:
+                      type: integer
+                    pending:
+                      type: boolean
+                    transactionNature:
+                      type: string
+                    createdTS:
+                      type: integer
+                    merchantCountry:
+                      type: integer
+                    smartLinkId:
+                      type: string
+                      format: uuid
+                    linkId:
+                      type: string
+                      format: uuid
+                    confirmed:
+                      type: integer
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /smrt/transactions/{transactionId}:
+    get:
+      description: Transaction metadata
+      tags:
+      - transactions
+      parameters:
+      - name: transactionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /transactions/{transactionId}/metadata:
+    get:
+      description: Transaction metadata
+      tags:
+      - transactions
+      parameters:
+      - name: transactionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: "Metadata"
+          content:
+            application/json:
+              schema:
+                type: object
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /smrt/reports/{from}/{to}/statements:
+    get:
+      description: "Download transactions as CSV"
+      tags:
+      - transactions
+      parameters:
+      - name: from
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: to
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: "Result csv file. Accept headers must not be set."
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        406:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  timestamp: 1524940310519
+                  status: 406
+                  error: Not Acceptable
+                  exception: org.springframework.web.HttpMediaTypeNotAcceptableException
+                  message: Not Acceptable
+                  path: /smrt/reports/%7Bfrom%7D/%7Bto%7D/statements
+  /transactions/so:
+    get:
+      description: "List standing orders"
+      tags:
+      - transactions
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  paging:
+                    type: object
+                    properties:
+                      totalResults:
+                        type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /statements:
+    get:
+      description: "List statements"
+      tags:
+      - transactions
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    url:
+                      type: string
+                      format: url
+                    visibleTS:
+                      type: integer
+                    month:
+                      type: integer
+                    year:
+                      type: integer
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /statements/{statementId}:
+    get:
+      description: "Bank statements as PDF"
+      tags:
+      - transactions
+      parameters:
+      - name: statementId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /smrt/statistics/categories/{from}/{to}:
+    get:
+      description: ""
+      tags:
+      - transactions
+      parameters:
+      - name: from
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: to
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  from:
+                    type: integer
+                  to:
+                    type: integer
+                  total:
+                    type: number
+                  totalIncome:
+                    type: number
+                  totalExpense:
+                    type: number
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CategoryItem'
+                  incomeItems:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CategoryItem'
+                  expenseItems:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CategoryItem'
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /barzahlen/check:
+    get:
+      description: "Details about barzahlen"
+      tags:
+      - account
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  depositAllowance:
+                    type: string
+                  withdrawAllowance:
+                    type: string
+                  remainingAmountMonth:
+                    type: string
+                  feeRate:
+                    type: string
+                  ash26WithdrawalsCount:
+                    type: string
+                  cash26WithdrawalsSum:
+                    type: string
+                  atmWithdrawalsCount:
+                    type: string
+                  atmWithdrawalsSum:
+                    type: string
+                  monthlyDepositFeeThreshold:
+                    type: string
+                  success:
+                    type: boolean
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /barzahlen/branches:
+    get:
+      description: "List locations"
+      security: []
+      tags:
+      - public
+      parameters:
+      - name: nelat
+        in: query
+        required: true
+        schema:
+          type: number
+          example: 49.2
+      - name: nelon
+        in: query
+        required: true
+        schema:
+          type: number
+          example: 8.2
+      - name: swlat
+        in: query
+        required: true
+        schema:
+          type: number
+          example: 49
+      - name: swlon
+        in: query
+        required: true
+        schema:
+          type: number
+          example: 8
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /smrt/categories:
+    get:
+      description: "List categories with icons"
+      tags:
+      - misc
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    base64image:
+                      description: "Base64 encoded image"
+                      type: string
+                      format: binary
+                    name:
+                      type: string
+                    backgroundUrl:
+                      type: string
+                      format: url
+        401:
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /features/countries/{country}:
+    get:
+      description: "Country features"
+      security: []
+      tags:
+      - public
+      parameters:
+      - name: country
+        in: path
+        required: true
+        schema:
+          type: string
+          example: DEU
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /products:
+    get:
+      description: "Info"
+      tags:
+      - misc
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /version:
+    get:
+      description: "Info"
+      security: []
+      tags:
+      - public
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+  /aff/invitations:
+    get:
+      description: "Info"
+      tags:
+      - misc
+      responses:
+        200:
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+components:
+  schemas:
+    Me:
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        kycFirstName:
+          type: string
+        kycLastName:
+          type: string
+        title:
+          type: string
+        gender:
+          type: string
+        birthDate:
+          type: integer
+        signupCompleted:
+          type: boolean
+        nationality:
+          type: string
+        mobilePhoneNumber:
+          type: string
+          format: phone
+        shadowUserId:
+          type: string
+          format: uuid
+        transferWiseTermsAccepted:
+          type: boolean
+    Card:
+      properties:
+        id:
+          type: string
+          format: uuid
+        publicToken:
+          nullable: true
+        pan:
+          nullable: true
+        maskedPan:
+          type: string
+        expirationDate:
+          type: integer
+        cardType:
+          type: string
+        status:
+          type: string
+        cardProduct:
+          nullable: true
+        cardProductType:
+          type: string
+        pinDefined:
+          type: integer
+        cardActivated:
+          type: integer
+        usernameOnCard:
+          type: string
+        exceetExpressCardDelivery:
+          type: boolean
+          nullable: true
+        membership:
+          nullable: true
+        exceetActualDeliveryDate:
+          nullable: true
+        exceetExpressCardDeliveryEmailSent:
+          nullable: true
+        exceetCardStatus:
+          nullable: true
+        exceetExpectedDeliveryDate:
+          nullable: true
+        exceetExpressCardDeliveryTrackingId:
+          nullable: true
+        cardSettingsId:
+          nullable: true
+        applePayEligible:
+          type: boolean
+        googlePayEligible:
+          type: boolean
+        design:
+          type: string
+        orderId:
+          nullable: true
+        mptsCard:
+          type: boolean
+    CategoryItem:
+      properties:
+        id:
+          type: string
+          title: Category ID
+        income:
+          type: number
+        expense:
+          type: number
+        total:
+          type: number
+    Error:
+      properties:
+        error:
+          type: string
+        error_description:
+          type: string
+      example:
+        error: "unauthorized"
+        error_description: "An Authentication object was not found in the SecurityContext"
+  securitySchemes:
+    auth:
+      type: oauth2
+      description: "Client ID: android, Client Secret: secret, request type: Request body"
+      flows:
+        password:
+          tokenUrl: https://api.tech26.de/oauth/token
+          scopes:
+            read: Read data
+            write: Write data
+            trust: Trust
+tags:
+- name: public
+- name: account
+- name: transactions
+- name: misc
+
+externalDocs:
+  description: "Find out more about OpenAPI"
+  url: "http://swagger.io"
+
